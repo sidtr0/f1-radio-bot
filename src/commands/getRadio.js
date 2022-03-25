@@ -62,7 +62,9 @@ export class LatestRadioCommand extends Command {
     const lastIndex = latestSessionRadios.length - 1;
     const racePath = await this.getLatestPath();
     let radioPath;
-    if (!index || index === 0) {
+    if (index === 0) {
+      radioPath = latestSessionRadios[index].Path;
+    } else if (!index) {
       index = 0;
       radioPath = reversed[index].Path;
     } else if (index > lastIndex || index < -lastIndex) {

@@ -4,15 +4,11 @@ A Discord bot with the sole function of getting the radio messages from the late
 
 ## How to use
 
-To get the latest message in a session, use `/getradio`
+To get the latest message in a session, use `/getradio` with no arguments
 
-![](https://i.imgur.com/oTOfPDe.png)
+![](https://i.imgur.com/P0IgDh7.png)
 
-![](https://i.imgur.com/xm5naoY.png)
 
-If you want to get `n`th radio message from the end, use `/getradio index: n`. For example, this command gets the 1st radio message from the end. Remember that searches are 0 indexed, meaning that `/getradio index: 0` gets the latest radio, while `/getradio index: 1` gets the radio before the latest radio.
-
-![](https://i.imgur.com/1JpybiL.png)
 
 ## Todo
 
