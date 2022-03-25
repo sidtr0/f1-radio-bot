@@ -12,6 +12,9 @@ const client = new SapphireClient({
 
 client.on("ready", () => {
   console.log("Ready!");
+  client.guilds.cache.forEach((guild) => {
+    console.log(guild.name);
+  });
 });
 
 client.login(process.env.TOKEN);

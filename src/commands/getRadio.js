@@ -1,7 +1,6 @@
 import { Command, ApplicationCommandRegistry } from "@sapphire/framework";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import fetch from "node-fetch";
-import fs from "fs";
 
 export class LatestRadioCommand extends Command {
   registerApplicationCommands(registry) {
@@ -16,7 +15,7 @@ export class LatestRadioCommand extends Command {
       );
     registry.registerChatInputCommand(builder, {
       // behaviorWhenNotIdentical: "OVERWRITE",
-      idHints: ["956386832432656404"],
+      idHints: ["956786997446463498"],
     });
   }
 
@@ -24,12 +23,13 @@ export class LatestRadioCommand extends Command {
     await interaction.reply("Getting requested radio...");
     const index = interaction.options.getInteger("index");
     console.log(index);
+    console.log(interaction.id);
     const radioUrl = await this.getLatestRadio(index);
     const latestSessionRadios = (await this.getLatestSessionRadios()).Captures;
     const lastIndex = latestSessionRadios.length - 1;
     if (!radioUrl) {
       return await interaction.editReply(
-        `No radio message found. Please check the index number. Largest possible value for index is \`${lastIndex}\`.`
+        `No radio message found. Please check the index number. There are only ${lastIndex} radio(s) so largest possible value for index is \`${lastIndex}\` and smallest possible value for index is \`${-lastIndex}\`.`
       );
     }
     await interaction.editReply({
@@ -51,24 +51,30 @@ export class LatestRadioCommand extends Command {
     const latestSessionRadiosUrl = `https://livetiming.formula1.com/static/${path}TeamRadio.json`;
     const latestSessionRadios = await fetch(latestSessionRadiosUrl);
     const radios = await latestSessionRadios.json();
+    console.log(latestSessionRadiosUrl);
     return radios;
   }
 
   async getLatestRadio(index) {
     const latestSessionRadios = (await this.getLatestSessionRadios()).Captures;
+    // reverse() is destructive, so you have to copy it first using spread operator`
+    const reversed = [...latestSessionRadios].reverse();
     const lastIndex = latestSessionRadios.length - 1;
     const racePath = await this.getLatestPath();
-    if (!index) index = 0;
-    console.log(lastIndex);
-    if (index > lastIndex) return;
-    const radioPath = latestSessionRadios[lastIndex - index].Path;
-    const radioUrl = `http://livetiming.formula1.com/static/${
+    let radioPath;
+    if (!index || index === 0) {
+      index = 0;
+      radioPath = reversed[index].Path;
+    } else if (index > lastIndex || index < -lastIndex) {
+      return null;
+    } else if (index > 0) {
+      radioPath = latestSessionRadios[index].Path;
+    } else if (index < 0) {
+      radioPath = reversed[Math.abs(index)].Path;
+    }
+    const radioUrl = `https://livetiming.formula1.com/static/${
       racePath + radioPath
     }`;
-    fetch(radioUrl).then((res) => {
-      const destination = fs.createWriteStream("./data/radio.mp3");
-      res.body.pipe(destination);
-    });
     console.log(radioUrl);
     return radioUrl;
   }
